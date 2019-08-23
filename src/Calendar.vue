@@ -40,7 +40,7 @@
 
 		<div v-if="showDialog" class="dialog-wrapper">
 			<div class="dialog">
-				<h2>Create Event</h2>
+				<h2>{{ dialogData.id != null ? 'Edit' : "Create" }} Event</h2>
 				<span class="close" @click="showDialog = false">&#10005;</span>
 				<div v-if="formError" class="form-error">{{ formError }}</div>
 				<form @submit="submitEvent">
@@ -65,7 +65,13 @@
 					</div>
 					<div style="color: red; font-size: 12px">* Required Fields</div>
 					<div class="row">
-						<button id="submit" type="submit">Save Event</button>
+						<button id="submit" type="submit">Save</button>
+						<button
+							v-if="dialogData.id != null"
+							id="delete"
+							type="button"
+							@click="deleteEvent"
+						>Delete</button>
 					</div>
 				</form>
 			</div>
@@ -199,7 +205,20 @@ export default {
 
 			this.showDialog = false;
 			console.log('event Saved');
-		}
+		},
+
+		deleteEvent() {
+			const date = this.dialogData.date.unix();
+			const day = this.dialogData.date.day();
+			const week = this.dialogData.week;
+
+			this.events[date] = this.events[date].filter((val, i) => i !== this.dialogData.id);
+			this.monthData[week][day].events = this.monthData[week][day].events.filter((val, i) => i !== this.dialogData.id);
+
+			localStorage.setItem('events', JSON.stringify(this.events));
+			this.showDialog = false;
+			console.log('event deleted');
+		},
 	}
 }
 </script>
@@ -241,13 +260,13 @@ td.not-current {
 td .date {
 	font-weight: bold;
 	border-radius: 50%;
-	padding: 5px;
 	cursor: pointer;
 }
 td .date:hover {
 	background-color: #e7e7e7;
 }
 td.today .date {
+	padding: 5px;
 	background-color: #2196f3;
 	color: white;
 }
@@ -259,6 +278,9 @@ td.today .date {
 	margin-top: 5px;
 	background-color: #eaf7f1;
 	cursor: pointer;
+}
+.event:hover {
+	background-color: #d3f1e3;
 }
 .event-name {
 	font-weight: bold;
@@ -329,9 +351,8 @@ td.today .date {
 	padding: 7px;
 	border-radius: 5px;
 }
-.dialog #submit {
+.dialog button {
 	font-size: 15px;
-	background-color: #2196f3;
 	outline: none;
 	border: none;
 	border-radius: 5px;
@@ -339,7 +360,17 @@ td.today .date {
 	padding: 10px 20px;
 	cursor: pointer;
 }
+.dialog #submit {
+	background-color: #2196f3;
+}
 .dialog #submit:hover {
 	background-color: #51a1e1;
+}
+.dialog #delete {
+	margin-left: 20px;
+	background-color: #f56c6c;
+}
+.dialog #delete:hover {
+	background-color: #f78989;
 }
 </style>
