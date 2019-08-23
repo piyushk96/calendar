@@ -95,6 +95,7 @@ export default {
 			dialogData: {},
 			events: {},
 			formError: '',
+			scrollTime: null,
 		};
 	},
 
@@ -135,15 +136,19 @@ export default {
 		},
 
 		handleScroll(e) {
-			const el = this.$refs['container'];
+			// Delay between scroll
+			if (this.scrollTime && this.scrollTime + 300 > Date.now()) return
 
+			const el = this.$refs['container'];
 			if (e.deltaY < 0 && el.scrollTop === 0) {		// Move UP
 				this.current.subtract(1, 'month');
 				this.loadMonthData();
+				this.scrollTime = Date.now();
 			}
-			else if (e.deltaY > 0 && (el.scrollHeight < el.scrollTop + el.offsetHeight + 2)) {
+			else if (e.deltaY > 0 && (el.scrollHeight < el.scrollTop + el.offsetHeight + 2)) {		// Move Down
 				this.current.add(1, 'month');
 				this.loadMonthData();
+				this.scrollTime = Date.now();
 			}
 		},
 
