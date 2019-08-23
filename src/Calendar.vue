@@ -31,7 +31,7 @@
 								class="event"
 								@click="(e) => openDialog({id: k, date: dayData.momentDate, ...event, week: weekNum}, e)">
 								<div class="event-name">{{ event.name }}</div>
-								<div style="font-size: 11px">
+								<div style="font-size: 13px; margin-top: 2px">
 									<span v-if="event.start">{{ event.start }}</span>
 									<span v-if="event.end"> - {{ event.end }}</span>
 								</div>
@@ -276,9 +276,12 @@ table {
 	width: 90%;
 	border-collapse: collapse;
 }
+th {
+	padding: 8px 0;
+}
 td {
 	width: 14.28%;
-	height: 130px;
+	height: 125px;
 	vertical-align: top;
 	padding: 5px;
 }
@@ -304,12 +307,12 @@ td.today .date {
 	color: white;
 }
 .event {
-	font-size: 13px;
+	font-size: 15px;
 	padding: 3px 5px;
 	border-left: 5px solid #4CAF50;
 	border-radius: 1px;
 	margin-top: 5px;
-	background-color: #eaf7f1;
+	background-color: #dff7ec;
 	cursor: pointer;
 }
 .event:hover {
