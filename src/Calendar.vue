@@ -278,7 +278,7 @@ table {
 }
 td {
 	width: 14.28%;
-	height: 100px;
+	height: 130px;
 	vertical-align: top;
 	padding: 5px;
 }
