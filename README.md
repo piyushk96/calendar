@@ -1,4 +1,14 @@
-# calendar
+# Calendar
+
+## Features
+- View all events of a current month
+- Add and schedule events by clicking on any cell
+- Click any event to edit or delete
+- Scroll Up/Down to switch month
+
+## Requirements
+- node >= v8.x
+- yarn
 
 ## Project setup
 ```
@@ -15,15 +25,6 @@ yarn run serve
 yarn run build
 ```
 
-### Run your tests
-```
-yarn run test
-```
-
-### Lints and fixes files
-```
-yarn run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+Note:
+- You can find code for calendar in `src/Calendar.vue`
+- Compiled files are available in dist
