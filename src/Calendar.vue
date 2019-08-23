@@ -211,7 +211,7 @@ header {
 	box-shadow: 0 1px 2px 1px #c4c4c4;
 }
 table {
-	margin: 40px auto 100px;
+	margin: 40px auto;
 	width: 90%;
 	border-collapse: collapse;
 }
