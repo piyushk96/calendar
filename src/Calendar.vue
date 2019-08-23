@@ -9,7 +9,7 @@
 				</th>
 			</thead>
 			<tbody>
-				<tr v-for="(weekData, i) in monthData" :key="i">
+				<tr v-for="(weekData, weekNum) in monthData" :key="weekNum">
 					<td
 						v-for="(dayData, j) in weekData"
 						:key="j"
@@ -17,11 +17,15 @@
 							dayData.momentDate.month() !== current.month() ? 'not-current' :
 							today.isSame(dayData.momentDate, 'day') ? 'today' : ''
 						"
-						@click="openDialog(dayData.momentDate, i)">
+						@click="(e) => openDialog({date: dayData.momentDate, week: weekNum}, e)">
 						<span class="date">{{ dayData.momentDate.date() }}</span>
 
 						<div v-if="dayData.events.length" class="events">
-							<div v-for="(event, k) in dayData.events" :key="k" class="event">
+							<div
+								v-for="(event, k) in dayData.events"
+								:key="k"
+								class="event"
+								@click="(e) => openDialog({id: k, date: dayData.momentDate, ...event, week: weekNum}, e)">
 								<div class="event-name">{{ event.name }}</div>
 								<div style="font-size: 11px">
 									<span v-if="event.start">{{ event.start }}</span>
@@ -42,22 +46,22 @@
 				<form @submit="submitEvent">
 					<div class="row">
 						<label for="name" class="required">Name:</label>
-						<input type="text" name="name" required />
+						<input type="text" name="name" v-model="dialogData.name" required />
 					</div>
 					<div class="row">
 						<label for="date" class="required">Date:</label>
 						<input
 							type="text"
 							name="date"
-							:value="selectedDate.format('DD MMM YYYY')"
+							:value="dialogData.date.format('DD MMM YYYY')"
 							readonly
 							required />
 					</div>
 					<div class="row">
 						<label for="start">Start Time:</label>
-						<input type="text" name="start" placeholder="HH:MM" />
+						<input type="text" name="start" v-model="dialogData.start" placeholder="HH:MM" />
 						<label for="end">End Time:</label>
-						<input type="text" name="end" placeholder="HH:MM" />
+						<input type="text" name="end" v-model="dialogData.end" placeholder="HH:MM" />
 					</div>
 					<div style="color: red; font-size: 12px">* Required Fields</div>
 					<div class="row">
@@ -82,8 +86,7 @@ export default {
 			weekDays: moment.weekdays(),
 			monthData: [],
 			showDialog: false,
-			selectedDate: null,
-			selectedWeek: null,
+			dialogData: {},
 			events: {},
 			formError: '',
 		};
@@ -138,11 +141,19 @@ export default {
 			}
 		},
 
-		openDialog(momentDate, week) {
+		openDialog(data, e) {
 			this.formError = '';
-			this.selectedDate = momentDate;
-			this.selectedWeek = week;
+			this.dialogData = Object.assign({
+				id: null,
+				name: '',
+				date: null,
+				start: '',
+				end: '',
+				week: null,
+			}, data);
 			this.showDialog = true;
+
+			e.stopPropagation();
 		},
 
 		isValidTime(time) {
@@ -161,32 +172,30 @@ export default {
 			e.preventDefault();
 			this.formError = '';
 
-			const formData = new FormData(e.target);
-			const eventData = {
-				name: formData.get('name'),
-				start: formData.get('start'),
-				end: formData.get('end'),
-			};
-
-			if (!this.isValidTime(eventData.start) || !this.isValidTime(eventData.end)) {
+			if (!this.isValidTime(this.dialogData.start) || !this.isValidTime(this.dialogData.end)) {
 				this.formError = 'Invalid Time';
 				return;
 			}
-			let date = formData.get('date');
-			date = this.selectedDate.unix();
 
-			if (this.events[date]) {
-				this.events[date].push(eventData);
+			const date = this.dialogData.date.unix();
+			const day = this.dialogData.date.day();
+			const week = this.dialogData.week;
+			const eventData = (({name, start, end}) => ({name, start, end}))(this.dialogData);
+
+			if (!this.events[date]) {
+				this.events[date] = [eventData];
+				this.monthData[week][day].events.push(eventData);
+			}
+			else if (this.dialogData.id != null) {
+				this.events[date][this.dialogData.id] = eventData;
+				this.monthData[week][day].events[this.dialogData.id] = eventData;
 			}
 			else {
-				this.events[date] = [eventData];
+				this.events[date].push(eventData);
+				this.monthData[week][day].events.push(eventData);
 			}
 
 			localStorage.setItem('events', JSON.stringify(this.events));
-
-			// update table
-			const day = this.selectedDate.day();
-			this.monthData[this.selectedWeek][day].events.push(eventData);
 
 			this.showDialog = false;
 			console.log('event Saved');
