@@ -13,9 +13,12 @@
 					<td
 						v-for="(dayData, j) in weekData"
 						:key="j"
-						:class="dayData.momentDate.month() !== current.month() ? 'not-current' : ''"
+						:class="
+							dayData.momentDate.month() !== current.month() ? 'not-current' :
+							today.isSame(dayData.momentDate, 'day') ? 'today' : ''
+						"
 						@click="openDialog(dayData.momentDate, i)">
-						<span style="font-weight: bold">{{ dayData.momentDate.date() }}</span>
+						<span class="date">{{ dayData.momentDate.date() }}</span>
 
 						<div v-if="dayData.events.length" class="events">
 							<div v-for="(event, k) in dayData.events" :key="k" class="event">
@@ -74,6 +77,7 @@ export default {
 
 	data() {
 		return {
+			today: moment(),
 			current: moment(),
 			weekDays: moment.weekdays(),
 			monthData: [],
@@ -219,11 +223,24 @@ td {
 	width: 14.28%;
 	height: 100px;
 	vertical-align: top;
-	padding: 5px;
+	padding: 10px 5px 5px 10px;
 }
 td.not-current {
 	color: gray;
 	background-color: #e9e9e9;
+}
+td .date {
+	font-weight: bold;
+	border-radius: 50%;
+	padding: 5px;
+	cursor: pointer;
+}
+td .date:hover {
+	background-color: #e7e7e7;
+}
+td.today .date {
+	background-color: #2196f3;
+	color: white;
 }
 .event {
 	font-size: 13px;
@@ -232,6 +249,7 @@ td.not-current {
 	border-radius: 1px;
 	margin-top: 5px;
 	background-color: #eaf7f1;
+	cursor: pointer;
 }
 .event-name {
 	font-weight: bold;
