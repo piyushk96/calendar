@@ -1,6 +1,10 @@
 <template>
 	<div ref="container" id="container">
-		<header>{{ current.format('MMMM') }}, {{ current.year() }}</header>
+		<header>
+			<span class="arrow-control left" @click="loadMonthData(-1)">&#10094;</span>
+			<span style="min-width: 230px">{{ current.format('MMMM') }}, {{ current.year() }}</span>
+			<span class="arrow-control right" @click="loadMonthData(1)">&#10095;</span>
+		</header>
 
 		<table border="1">
 			<thead>
@@ -111,7 +115,10 @@ export default {
 	},
 
 	methods: {
-		loadMonthData() {
+		loadMonthData(move) {
+			if (move === 1) this.current.add(1, 'month');
+			else if (move === -1) this.current.subtract(1, 'month');
+
 			let week = -1;
 			let date = this.current.clone().startOf('month').startOf('week');
 			const monthEnd = this.current.clone().endOf('month').endOf('week');
@@ -141,13 +148,11 @@ export default {
 
 			const el = this.$refs['container'];
 			if (e.deltaY < 0 && el.scrollTop === 0) {		// Move UP
-				this.current.subtract(1, 'month');
-				this.loadMonthData();
+				this.loadMonthData(-1);
 				this.scrollTime = Date.now();
 			}
 			else if (e.deltaY > 0 && (el.scrollHeight < el.scrollTop + el.offsetHeight + 2)) {		// Move Down
-				this.current.add(1, 'month');
-				this.loadMonthData();
+				this.loadMonthData(1);
 				this.scrollTime = Date.now();
 			}
 		},
@@ -246,6 +251,24 @@ header {
 	position: sticky;
 	top: 0;
 	box-shadow: 0 1px 2px 1px #c4c4c4;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+header .arrow-control {
+	color: #5f6368;
+	cursor: pointer;
+	width: 25px;
+	height: 25px;
+	padding: 5px;
+	margin: 0 100px;
+	display: inline-block;
+	border-radius: 50%;
+	font-size: 18px;
+	box-sizing: content-box;
+}
+header .arrow-control:hover {
+	background-color: #e7e7e7;
 }
 table {
 	margin: 40px auto;
@@ -256,7 +279,7 @@ td {
 	width: 14.28%;
 	height: 100px;
 	vertical-align: top;
-	padding: 10px 5px 5px 10px;
+	padding: 5px;
 }
 td.not-current {
 	color: gray;
@@ -266,12 +289,16 @@ td .date {
 	font-weight: bold;
 	border-radius: 50%;
 	cursor: pointer;
+	padding: 5px;
+	display: inline-block;
+	width: 27px;
+	height: 27px;
+	text-align: center;
 }
 td .date:hover {
 	background-color: #e7e7e7;
 }
 td.today .date {
-	padding: 5px;
 	background-color: #2196f3;
 	color: white;
 }
