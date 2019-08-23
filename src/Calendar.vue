@@ -104,6 +104,7 @@ export default {
 	},
 
 	created() {
+		document.title = 'Calendar';
 		const data = localStorage.getItem('events');
 		this.events = data ? JSON.parse(data) : {};
 
